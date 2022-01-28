@@ -1,4 +1,4 @@
-module STrAW
+module StableApproxEPW
 
 using LinearAlgebra, SparseArrays, SpecialFunctions
 using FastGaussQuadrature, Roots

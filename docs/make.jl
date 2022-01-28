@@ -1,7 +1,7 @@
 push!(LOAD_PATH,"../src/")
 using Pkg
 Pkg.activate("./")
-using Documenter, Literate, STrAW
+using Documenter, Literate, StableApproxEPW
 
 # # Generating some documentation files with `Literate.jl`
 # rm("./src/example.md")
