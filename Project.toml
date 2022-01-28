@@ -1,3 +1,8 @@
+name = "StableApproxEPW"
+uuid = "bb028548-2d0c-4a71-9df6-74ac4a01dec8"
+authors = ["Emile Parolin <emile.parolin@gmail.com>"]
+version = "0.1.0"
+
 [deps]
 FastGaussQuadrature = "442a2c76-b920-505d-bb47-c5924d526838"
 Interpolations = "a98d9a8b-a2ab-59e6-89dd-64a1c18fca59"
