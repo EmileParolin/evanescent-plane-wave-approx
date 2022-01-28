@@ -5,6 +5,6 @@
 ## Installation
 Install from the Pkg REPL:
 ```
-pkg> add StableApproxEPW
+pkg> add https://github.com/EmileParolin/evanescent-plane-wave-approx
 ```
 
