@@ -17,6 +17,6 @@ end
     include("plane-waves.jl")
 end
 
-@testset "Dirichlet_sampling.jl" begin
-    include("Dirichlet_sampling.jl")
+@testset "dirichlet_sampling.jl" begin
+    include("dirichlet_sampling.jl")
 end
