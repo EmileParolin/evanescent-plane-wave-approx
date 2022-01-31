@@ -4,8 +4,7 @@
 
 [![Docs](https://img.shields.io/badge/docs-dev-blue.svg)](https://EmileParolin.github.io/evanescent-plane-wave-approx/dev/)
 ![CI](https://github.com/EmileParolin/evanescent-plane-wave-approx/workflows/CI/badge.svg?branch=trunk)
-[![coveralls](https://coveralls.io/repos/github/JuliaCI/Coverage.jl/badge.svg?branch=master)](https://coveralls.io/github/JuliaCI/Coverage.jl?branch=trunk)
-[![codecov](https://codecov.io/gh/JuliaCI/Coverage.jl/branch/master/graph/badge.svg?label=codecov)](https://codecov.io/gh/JuliaCI/Coverage.jl)
+[![codecov](https://codecov.io/gh/EmileParolin/evanescent-plane-wave-approx/branch/trunk/graph/badge.svg?token=7ZZFHNE8XP)](https://codecov.io/gh/EmileParolin/evanescent-plane-wave-approx)
 
 ## Installation
 Install from the Pkg REPL:
