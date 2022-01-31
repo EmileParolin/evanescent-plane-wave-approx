@@ -6,6 +6,8 @@ version = "0.1.0"
 [deps]
 FastGaussQuadrature = "442a2c76-b920-505d-bb47-c5924d526838"
 Interpolations = "a98d9a8b-a2ab-59e6-89dd-64a1c18fca59"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+QuasiMonteCarlo = "8a4e6c94-4038-4cdc-81c3-7e6ffdb2a71b"
 Roots = "f2b01f46-fcfa-551c-844a-d8ac1e96c665"
 SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
