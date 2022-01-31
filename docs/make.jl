@@ -1,9 +1,5 @@
 push!(LOAD_PATH,joinpath(@__DIR__, "../src/"))
-using Documenter, Literate, StableApproxEPW
-
-# # Generating some documentation files with `Literate.jl`
-# rm("./src/example.md")
-# Literate.markdown("../examples/example.jl", "./src/"; flavor=Literate.DocumenterFlavor())
+using Documenter, StableApproxEPW
 
 # Generating documentation with `Documenter.jl`
 makedocs(
@@ -12,6 +8,11 @@ makedocs(
     format = Documenter.HTML(prettyurls = get(ENV, "CI", nothing) == "true"),
     sitename="Stable Approx with EPW",
     authors="Emile Parolin",
+    pages=[
+        "Getting started" => "index.md",
+        "Examples" => "example.md"
+        "Source" => "implementation.md"
+    ],
 )
 
 deploydocs(
