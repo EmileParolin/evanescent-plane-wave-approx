@@ -2,10 +2,10 @@ name: CI
 on:
   push:
     branches:
-     - master
+     - trunk
   pull_request:
     branches:
-     - master
+     - trunk
 jobs:
   test:
     name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }}
@@ -26,3 +26,7 @@ jobs:
           arch: ${{ matrix.arch }}
       - uses: julia-actions/julia-buildpkg@latest
       - uses: julia-actions/julia-runtest@latest
+      - uses: julia-actions/julia-processcoverage@v1
+      - uses: codecov/codecov-action@v1
+        with:
+          file: lcov.info
