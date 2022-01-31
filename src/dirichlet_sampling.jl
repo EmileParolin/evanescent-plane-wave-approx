@@ -41,7 +41,7 @@ optional parameter `P`.
 number_of_boundary_sampling_nodes(M; η=2, P=0) = max(η * M, 2P+1)
 
 """
-    Dirichlet_sampling(k, N, U; smpl_type=nothing, η=2, ϵ=1e-8, Q=(length(U)-1)//2)
+    Dirichlet_sampling(k, N, U; smpl_type=nothing, η=2, ϵ=1e-14, Q=(length(U)-1)//2)
 
 Example of reconstruction of a solution surrogate via Dirichlet sampling.
 
@@ -54,7 +54,7 @@ oversampling ration `η`.
 The amount of regularization in the SVD can be controlled by the regularization
 parameter `ϵ`.
 """
-function Dirichlet_sampling(k, U, N; smpl_type=nothing, η=2, ϵ=1e-8,
+function Dirichlet_sampling(k, U, N; smpl_type=nothing, η=2, ϵ=1e-14,
                             Q=Integer((length(U)-1)//2))
     # Maximum mode number in approximation target
     P = Integer((length(U) - 1) // 2)

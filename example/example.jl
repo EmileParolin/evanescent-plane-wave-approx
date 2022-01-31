@@ -5,18 +5,16 @@ using StableApproxEPW
 # ## Target of the approximation problem
 
 # We consider the Helmholtz solution in the unit disk, with wavenumber
-k = 10;
-
-# We need to define the maximum Fourier mode number in the approximation target
-P = 15;
-
+k = 5;
+# We need to define the maximum Fourier mode number `P` in the approximation
+# target:
+P = 25;
 # Next we construct the vector of coefficients in the basis `b_p`
-# for `p` in `[-P,P]`.
+# for `p` in `[-P,P]`:
 U = zeros(ComplexF64, 2P+1);
 U[P+1]     = 0.5;  # This is the constant mode (`p=0`)
 U[P+1 + P] = 1im;  # This is mode `p = P`
-
-# The target of the approximation problem can then be constructed as
+# The target of the approximation problem can then be constructed as:
 u = solution_surrogate(U; k=k);
 # ``u`` can be evaluated at any `(r,θ)` point.
 # Alternatively, the target ``u`` could have been a single mode.
@@ -27,67 +25,67 @@ u = solution_surrogate(U; k=k);
 
 # ## Reconstruction method
 
-N = 40;
-
-# Sampling nodes
+# The approximation will be reconstructed by sampling the target on the
+# boundary of the unit disk.
+# To do so, we need to know now the dimension `N` of the approximation sets
+# that we are going to use:
+N = 100;
+# We can determine the number of sampling nodes necessary for a successful
+# reconstruction, based on `N`, `P` (to avoid aliasing) and the oversampling
+# ratio `η`:
 S = number_of_boundary_sampling_nodes(N; η=2, P=P);
+# The (equispaced) boundary nodes are then constructed as:
 X = boundary_sampling_nodes(S);
-
-# Right-hand-side
+# The right-hand-side of the linear system can then be readily constructed:
 b = samples_from_nodes(u, X);
 
 
 # ## Approximation with **propagative** plane waves
 
-# ### Approximation set
-
+# We construct the approximation set of PPW:
 Φppw = approximation_set(N; k=k);
 # Matrix and its factorization
 Appw = samples_from_nodes(Φppw, X);
-
-
-# ### Solution
-
-iAppw = RegularizedSVDPseudoInverse(Appw; ϵ=1e-12);
-
-# The coefficients are computed using the 
+iAppw = RegularizedSVDPseudoInverse(Appw; ϵ=1e-14);
+# The coefficients of the approximation are computed:
 ξppw = solve_via_regularizedSVD(iAppw, b);
 ũppw = (r,θ) -> sum([ξi * ϕi(r,θ) for (ξi, ϕi) in zip(ξppw, Φppw)]);
-
-
-# ### Errors and stability estimate
-
-# Relative residual
-resppw = norm(Appw * ξppw - b) / norm(b)
-# Stability measure
-nrmppw = norm(ξppw) / norm(U)
 # Absolute error function
-eppw = (r,θ) -> ũppw(r,θ) - u(r,θ);
+eppw = (r,θ) -> ũppw(r,θ) - u(r,θ); eppw(1,π/2)
+# Let's compute the relative residual:
+resppw = norm(Appw * ξppw - b) / norm(b)
+# We did not obtained any accuracy whatsoever!
+# The reason is that the coefficients are too large:
+nrmppw = norm(ξppw) / norm(U)
 
 
 # ## Approximation with **evanescent** plane waves
 
-# ### Approximation set
-
+# We construct the approximation set of EPW:
 Φepw = approximation_set(N, P, sobol_sampling; k=k);
 # Matrix and its factorization
 Aepw = samples_from_nodes(Φepw, X);
-
-
-# ### Solution
-
-iAepw = RegularizedSVDPseudoInverse(Aepw; ϵ=1e-12);
-
-# The coefficients are computed using the 
+iAepw = RegularizedSVDPseudoInverse(Aepw; ϵ=1e-14);
+# The coefficients of the approximation are computed:
 ξepw = solve_via_regularizedSVD(iAepw, b);
 ũepw = (r,θ) -> sum([ξi * ϕi(r,θ) for (ξi, ϕi) in zip(ξepw, Φepw)]);
-
-
-# ### Errors and stability estimate
-
-# Relative residual
-resepw = norm(Aepw * ξepw - b) / norm(b)
-# Stability measure
-nrmepw = norm(ξepw) / norm(U)
 # Absolute error function
-eepw = (r,θ) -> ũepw(r,θ) - u(r,θ);
+eepw = (r,θ) -> ũepw(r,θ) - u(r,θ); eepw(1,π/2)
+# Let's compute the relative residual:
+resepw = norm(Aepw * ξepw - b) / norm(b)
+# We get almost 8 digits of accuracy!
+# The size of the coefficients remains quite high:
+nrmepw = norm(ξepw) / norm(U)
+
+# ### Down to machine precision
+
+# Let's double the number of EPW
+N = 200
+# The above approximation process can be obtained much more rapidly with the
+# following convenience function
+_, ξepw, ũepw, resepw, nrmepw, eepw = Dirichlet_sampling(k, U, N; smpl_type=sobol_sampling);
+# One can check that we obtain now a relative residual very close to machine
+# precision (13 digits of accuracy):
+resepw
+# The size of the coefficients is also greatly reduced:
+nrmepw

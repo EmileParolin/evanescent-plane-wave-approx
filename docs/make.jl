@@ -10,8 +10,8 @@ makedocs(
     authors="Emile Parolin",
     pages=[
         "Getting started" => "index.md",
-        "Examples" => "example.md"
-        "Source" => "implementation.md"
+        "Examples" => "example.md",
+        "Source" => "implementation.md",
     ],
 )
 

@@ -13,19 +13,20 @@ using StableApproxEPW
 We consider the Helmholtz solution in the unit disk, with wavenumber
 
 ````@example example
-k = 10;
+k = 5;
 nothing #hide
 ````
 
-We need to define the maximum Fourier mode number in the approximation target
+We need to define the maximum Fourier mode number `P` in the approximation
+target:
 
 ````@example example
-P = 15;
+P = 25;
 nothing #hide
 ````
 
 Next we construct the vector of coefficients in the basis `b_p`
-for `p` in `[-P,P]`.
+for `p` in `[-P,P]`:
 
 ````@example example
 U = zeros(ComplexF64, 2P+1);
@@ -34,7 +35,7 @@ U[P+1 + P] = 1im;  # This is mode `p = P`
 nothing #hide
 ````
 
-The target of the approximation problem can then be constructed as
+The target of the approximation problem can then be constructed as:
 
 ````@example example
 u = solution_surrogate(U; k=k);
@@ -50,20 +51,33 @@ by the user as target of the approximation problem.
 
 ## Reconstruction method
 
+The approximation will be reconstructed by sampling the target on the
+boundary of the unit disk.
+To do so, we need to know now the dimension `N` of the approximation sets
+that we are going to use:
+
 ````@example example
-N = 40;
+N = 100;
 nothing #hide
 ````
 
-Sampling nodes
+We can determine the number of sampling nodes necessary for a successful
+reconstruction, based on `N`, `P` (to avoid aliasing) and the oversampling
+ratio `η`:
 
 ````@example example
 S = number_of_boundary_sampling_nodes(N; η=2, P=P);
+nothing #hide
+````
+
+The (equispaced) boundary nodes are then constructed as:
+
+````@example example
 X = boundary_sampling_nodes(S);
 nothing #hide
 ````
 
-Right-hand-side
+The right-hand-side of the linear system can then be readily constructed:
 
 ````@example example
 b = samples_from_nodes(u, X);
@@ -72,7 +86,7 @@ nothing #hide
 
 ## Approximation with **propagative** plane waves
 
-### Approximation set
+We construct the approximation set of PPW:
 
 ````@example example
 Φppw = approximation_set(N; k=k);
@@ -83,17 +97,11 @@ Matrix and its factorization
 
 ````@example example
 Appw = samples_from_nodes(Φppw, X);
+iAppw = RegularizedSVDPseudoInverse(Appw; ϵ=1e-14);
 nothing #hide
 ````
 
-### Solution
-
-````@example example
-iAppw = RegularizedSVDPseudoInverse(Appw; ϵ=1e-12);
-nothing #hide
-````
-
-The coefficients are computed using the
+The coefficients of the approximation are computed:
 
 ````@example example
 ξppw = solve_via_regularizedSVD(iAppw, b);
@@ -101,30 +109,28 @@ ũppw = (r,θ) -> sum([ξi * ϕi(r,θ) for (ξi, ϕi) in zip(ξppw, Φppw)]);
 nothing #hide
 ````
 
-### Errors and stability estimate
+Absolute error function
 
-Relative residual
+````@example example
+eppw = (r,θ) -> ũppw(r,θ) - u(r,θ); eppw(1,π/2)
+````
+
+Let's compute the relative residual:
 
 ````@example example
 resppw = norm(Appw * ξppw - b) / norm(b)
 ````
 
-Stability measure
+We did not obtained any accuracy whatsoever!
+The reason is that the coefficients are too large:
 
 ````@example example
 nrmppw = norm(ξppw) / norm(U)
 ````
 
-Absolute error function
-
-````@example example
-eppw = (r,θ) -> ũppw(r,θ) - u(r,θ);
-nothing #hide
-````
-
 ## Approximation with **evanescent** plane waves
 
-### Approximation set
+We construct the approximation set of EPW:
 
 ````@example example
 Φepw = approximation_set(N, P, sobol_sampling; k=k);
@@ -135,17 +141,11 @@ Matrix and its factorization
 
 ````@example example
 Aepw = samples_from_nodes(Φepw, X);
+iAepw = RegularizedSVDPseudoInverse(Aepw; ϵ=1e-14);
 nothing #hide
 ````
 
-### Solution
-
-````@example example
-iAepw = RegularizedSVDPseudoInverse(Aepw; ϵ=1e-12);
-nothing #hide
-````
-
-The coefficients are computed using the
+The coefficients of the approximation are computed:
 
 ````@example example
 ξepw = solve_via_regularizedSVD(iAepw, b);
@@ -153,25 +153,52 @@ ũepw = (r,θ) -> sum([ξi * ϕi(r,θ) for (ξi, ϕi) in zip(ξepw, Φepw)]);
 nothing #hide
 ````
 
-### Errors and stability estimate
+Absolute error function
 
-Relative residual
+````@example example
+eepw = (r,θ) -> ũepw(r,θ) - u(r,θ); eepw(1,π/2)
+````
+
+Let's compute the relative residual:
 
 ````@example example
 resepw = norm(Aepw * ξepw - b) / norm(b)
 ````
 
-Stability measure
+We get almost 8 digits of accuracy!
+The size of the coefficients remains quite high:
 
 ````@example example
 nrmepw = norm(ξepw) / norm(U)
 ````
 
-Absolute error function
+### Down to machine precision
+
+Let's double the number of EPW
 
 ````@example example
-eepw = (r,θ) -> ũepw(r,θ) - u(r,θ);
+N = 200
+````
+
+The above approximation process can be obtained much more rapidly with the
+following convenience function
+
+````@example example
+_, ξepw, ũepw, resepw, nrmepw, eepw = Dirichlet_sampling(k, U, N; smpl_type=sobol_sampling);
 nothing #hide
+````
+
+One can check that we obtain now a relative residual very close to machine
+precision (13 digits of accuracy):
+
+````@example example
+resepw
+````
+
+The size of the coefficients is also greatly reduced:
+
+````@example example
+nrmepw
 ````
 
 ---
