@@ -9,11 +9,20 @@ k = 5;
 # We need to define the maximum Fourier mode number `P` in the approximation
 # target:
 P = 25;
+# The target approximation will be of the form
+# ```math
+# u = \mathbf{x} ↦ \sum_{|p| \leq P} u_p b_{p}(\mathbf{x}).
+# ```
 # Next we construct the vector of coefficients in the basis `b_p`
 # for `p` in `[-P,P]`:
 U = zeros(ComplexF64, 2P+1);
 U[P+1]     = 0.5;  # This is the constant mode (`p=0`)
 U[P+1 + P] = 1im;  # This is mode `p = P`
+# Here the only non-zero coefficients are ``u_0 = \frac{1}{2}`` and
+# ``u_P = \imath`` so that
+# ```math
+# u = \frac{1}{2} b_{0} + \imath b_{P}.
+# ```
 # The target of the approximation problem can then be constructed as:
 u = solution_surrogate(U; k=k);
 # ``u`` can be evaluated at any `(r,θ)` point.
@@ -44,7 +53,7 @@ b = samples_from_nodes(u, X);
 
 # We construct the approximation set of PPW:
 Φppw = approximation_set(N; k=k);
-# Matrix and its factorization
+# The matrix and its (SVD) factorization
 Appw = samples_from_nodes(Φppw, X);
 iAppw = RegularizedSVDPseudoInverse(Appw; ϵ=1e-14);
 # The coefficients of the approximation are computed:
@@ -63,7 +72,9 @@ nrmppw = norm(ξppw) / norm(U)
 
 # We construct the approximation set of EPW:
 Φepw = approximation_set(N, P, sobol_sampling; k=k);
-# Matrix and its factorization
+# It is possible to choose other types of sampling methods, instead of
+# `sobol_sampling`, for instance `uniform_sampling` and `random_sampling`.
+# The matrix and its (SVD) factorization
 Aepw = samples_from_nodes(Φepw, X);
 iAepw = RegularizedSVDPseudoInverse(Aepw; ϵ=1e-14);
 # The coefficients of the approximation are computed:

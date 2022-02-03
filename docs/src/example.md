@@ -25,6 +25,10 @@ P = 25;
 nothing #hide
 ````
 
+The target approximation will be of the form
+```math
+u = \mathbf{x} ↦ \sum_{|p| \leq P} u_p b_{p}(\mathbf{x}).
+```
 Next we construct the vector of coefficients in the basis `b_p`
 for `p` in `[-P,P]`:
 
@@ -35,6 +39,11 @@ U[P+1 + P] = 1im;  # This is mode `p = P`
 nothing #hide
 ````
 
+Here the only non-zero coefficients are ``u_0 = \frac{1}{2}`` and
+``u_P = \imath`` so that
+```math
+u = \frac{1}{2} b_{0} + \imath b_{P}.
+```
 The target of the approximation problem can then be constructed as:
 
 ````@example example
@@ -93,7 +102,7 @@ We construct the approximation set of PPW:
 nothing #hide
 ````
 
-Matrix and its factorization
+The matrix and its (SVD) factorization
 
 ````@example example
 Appw = samples_from_nodes(Φppw, X);
@@ -137,7 +146,9 @@ We construct the approximation set of EPW:
 nothing #hide
 ````
 
-Matrix and its factorization
+It is possible to choose other types of sampling methods, instead of
+`sobol_sampling`, for instance `uniform_sampling` and `random_sampling`.
+The matrix and its (SVD) factorization
 
 ````@example example
 Aepw = samples_from_nodes(Φepw, X);
